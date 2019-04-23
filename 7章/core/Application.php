@@ -105,7 +105,6 @@ abstract class Application
             $this->runAction($controller, $action, $params);
         } catch (HttpNotFoundException $e) {
             $this->render404Page($e);
-        
         } catch (UnauthorizedActionException $e) {
             list($controller, $action) = $this->login_action;
             $this->runAction($controller, $action);
@@ -119,7 +118,8 @@ abstract class Application
         $this->response->setStatusCode(404, 'Not Found');
         $message = $this->isDebugMode() ? $e->getMessage() : 'Page not found.';
         $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
-        $this->response->setContent(<<<EOF
+        $this->response->setContent(
+            <<<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
