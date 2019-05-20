@@ -5,7 +5,7 @@ abstract class DbRepository
 
     public function __construct($con)
     {
-        $this->setConnetion($con);
+        $this->setConnection($con);
     }
 
     public function setConnection($con)

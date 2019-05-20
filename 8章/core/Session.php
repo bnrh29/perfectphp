@@ -19,7 +19,7 @@ class Session
 
     public function get($name, $default = null)
     {
-        if (!isset($_SESSION[$name])) {
+        if (isset($_SESSION[$name])) {
             return $_SESSION[$name];
         }
         return $default;
@@ -30,7 +30,7 @@ class Session
         unset($_SESSION[$name]);
     }
 
-    public function clear($name)
+    public function clear()
     {
         $_SESSION = array();
     }

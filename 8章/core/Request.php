@@ -1,6 +1,5 @@
 <?php
-
-class Reuquest
+class Request
 {
     public function isPost()
     {

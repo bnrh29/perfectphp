@@ -12,7 +12,7 @@ abstract class Controller
 
     public function __construct($application)
     {
-        $this->controller_name = strtolower(sbustr(get_class($this), 0, -10));
+        $this->controller_name = strtolower(substr(get_class($this), 0, -10));
         $this->application = $application;
         $this->request = $application->getRequest();
         $this->response = $application->getResponse();
@@ -29,7 +29,7 @@ abstract class Controller
             $this->forward040();
         }
 
-        if ($this->needsAuthenication($action) && !$this->session->isAuthenicated()) {
+        if ($this->needsAuthenication($action) && !$this->session->isAuthenticated()) {
             throw new UnauthorizedActionException();
         }
 
@@ -95,7 +95,6 @@ abstract class Controller
 
         $token = sha1($form_name . session_id() . microtime());
         $tokens[] = $token;
-
         $this->session->set($key, $tokens);
 
         return $token;
@@ -105,7 +104,6 @@ abstract class Controller
     {
         $key = 'csrf_tokens/' . $form_name;
         $tokens = $this->session->get($key, array());
-
         if (false !== ($pos = array_search($token, $tokens, true))) {
             unset($tokens[$pos]);
             $this->session->set($key, $tokens);

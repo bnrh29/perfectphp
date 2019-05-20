@@ -9,14 +9,14 @@ class DbManager
     public function connect($name, $params)
     {
         $params = array_merge(array(
-            'dns' => null,
+            'dsn' => null,
             'user' => '',
-            'password' => 'null',
+            'password' => '',
             'options' => array(),
         ), $params);
 
         $con = new PDO(
-            $params['dns'],
+            $params['dsn'],
             $params['user'],
             $params['password'],
             $params['options']
