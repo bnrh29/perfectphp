@@ -1,13 +1,14 @@
 <?php
 abstract class Application
 {
-    protected $debug = false;
-    protected $request;
-    protected $response;
-    protected $session;
-    protected $dbmanager;
-    protected $login_action = array();
+    protected $debug = false;           // デバッグモード
+    protected $request;                 // リクエスト
+    protected $response;                // レスポンス
+    protected $session;                 // セッション
+    protected $dbmanager;               // DB
+    protected $login_action = array();  // ログインのコントローラとアクション
 
+    // コンストラクタ
     public function __construct($debug = false)
     {
         $this->setDebugmode($debug);
@@ -15,6 +16,7 @@ abstract class Application
         $this->configure();
     }
 
+    // デバッグモードを指定エラーの出力
     protected function setDebugMode($debug)
     {
         if ($debug) {
@@ -27,6 +29,7 @@ abstract class Application
         }
     }
 
+    // 初期化
     protected function initialize()
     {
         $this->request = new Request();
@@ -36,13 +39,26 @@ abstract class Application
         $this->router = new Router($this->registerRoutes());
     }
 
+    /**
+     * アプリケーションの設定
+     */
     protected function configure()
     {
         # code...
     }
 
+    /**
+     * プロジェクトのルートディレクトリを取得
+     *
+     * @return string ルートディレクトリへのファイルシステム上の絶対パス
+     */
     abstract public function getRootDir();
 
+    /**
+     * ルーティングを取得
+     *
+     * @return array
+     */
     abstract protected function registerRoutes();
 
     public function isDebugMode()
@@ -88,14 +104,21 @@ abstract class Application
     public function getWebDir()
     {
         return $this->getRootDir() . '/web';
+
     }
 
+    /**
+     * アプリケーションを実行する
+     *
+     * @throws HttpNotFoundException ルートが見つからない場合
+     */
     public function run()
     {
         try {
+            // ルーティング
             $params = $this->router->resolve($this->request->getPathInfo());
+            // ルートが見つからない場合エラー
             if ($params === false) {
-                // todo-A
                 throw new HttpNotFoundException('No route found for ' . $this->request->getPathInfo());
             }
 
@@ -103,9 +126,12 @@ abstract class Application
             $action = $params['action'];
 
             $this->runAction($controller, $action, $params);
+
         } catch (HttpNotFoundException $e) {
+            // ルートがない場合
             $this->render404Page($e);
         } catch (UnauthorizedActionException $e) {
+            // ログインしていないときログイン画面へ
             list($controller, $action) = $this->login_action;
             $this->runAction($controller, $action);
         }
@@ -113,6 +139,11 @@ abstract class Application
         $this->response->send();
     }
 
+    /**
+     * 404エラー画面を返す設定
+     *
+     * @param Exception $e
+     */
     protected function render404Page($e)
     {
         $this->response->setStatusCode(404, 'Not Found');
@@ -135,6 +166,15 @@ EOF
         );
     }
 
+    /**
+     * 指定されたアクションを実行する
+     *
+     * @param string $controller_name
+     * @param string $action
+     * @param array $params
+     *
+     * @throws HttpNotFoundException コントローラが特定できない場合
+     */
     public function runAction($controller_name, $action, $params = array())
     {
         $controller_class = ucfirst($controller_name) . 'Controller';
@@ -150,6 +190,12 @@ EOF
         $this->response->setContent($content);
     }
 
+    /**
+     * 指定されたコントローラ名から対応するControllerオブジェクトを取得
+     *
+     * @param string $controller_class
+     * @return Controller
+     */
     protected function findController($controller_class)
     {
         if (!class_exists($controller_class)) {

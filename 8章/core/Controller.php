@@ -29,15 +29,18 @@ abstract class Controller
             $this->forward040();
         }
 
+        // ログインが必要なアクションでログイン済みかチェック
         if ($this->needsAuthenication($action) && !$this->session->isAuthenticated()) {
             throw new UnauthorizedActionException();
         }
 
+        // アクション実行して出力内容を取得
         $content = $this->$action_method($params);
 
         return $content;
     }
 
+    // ログインが必要なアクションかチェック
     protected function needsAuthenication($action)
     {
         if ($this->auth_actions === true || (is_array($this->auth_actions) && in_array($action, $this->auth_actions))) {
@@ -55,22 +58,27 @@ abstract class Controller
             'session' => $this->session,
         );
 
+        // viewを作成
         $view = new View($this->application->getViewDir(), $defaults);
 
         if (is_null($template)) {
             $template = $this->action_name;
         }
 
+        // 表示するviewファイルを指定
         $path = $this->controller_name . '/' . $template;
 
+        // 表示する内容を返す
         return $view->render($path, $variables, $layout);
     }
 
+    // 404のエラー
     protected function forward404()
     {
         throw new HttpNotFoundException('Forwarded 404 page from ' . $this->controller_name . '/' . $this->action_name);
     }
 
+    // リダイレクト
     protected function redirect($url)
     {
         if (!preg_match('#https?://#', $url)) {
@@ -85,6 +93,7 @@ abstract class Controller
         $this->response->setHttpHeader('Location', $url);
     }
 
+    // token作成
     protected function generateCsrfToken($form_name)
     {
         $key = 'csrf_tokens/' . $form_name;
@@ -100,6 +109,7 @@ abstract class Controller
         return $token;
     }
 
+    // tokenをチェック
     protected function checkCsrfToken($form_name, $token)
     {
         $key = 'csrf_tokens/' . $form_name;

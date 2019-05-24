@@ -1,7 +1,9 @@
 <?php
 
+// MiniBlogのアプリケーション
 class MiniBlogApplication extends Application
 {
+    // ログインのコントローラーとアクションを指定
     protected $login_action = array('account', 'signin');
 
     public function getRootDir()
@@ -18,6 +20,7 @@ class MiniBlogApplication extends Application
             '/user/:user_name/status/:id' => array('controller' => 'status', 'action' => 'show'),
             '/account' => array('controller' => 'account', 'action' => 'index'),
             '/account/:action' => array('controller' => 'account'),
+            '/follow' => array('controller' => 'account', 'action' => 'follow'),
         );
     }
 
